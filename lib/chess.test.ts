@@ -13,7 +13,7 @@ describe("repertoire", () => {
 
   it("generates unique positions with legal answers", () => {
     const positions = createTrainingPositions();
-    expect(positions).toHaveLength(67);
+    expect(positions).toHaveLength(109);
     expect(new Set(positions.map((position) => positionKey(position.fen))).size).toBe(positions.length);
     for (const position of positions) {
       for (const answer of position.answers) {
