@@ -8,6 +8,7 @@ import { CheckIcon, CloseIcon, LightbulbIcon, TargetIcon } from "@/components/ic
 import { difficultyLabels, familyLabels } from "@/data/repertoire";
 import { formatMoveSequence } from "@/lib/chess";
 import { incrementSessions, recordAttempt, useProgress } from "@/lib/progress";
+import { playChessSound, playMoveSound } from "@/lib/sounds";
 import type { Difficulty, TrainingPosition, Variation, VariationFamily } from "@/types/repertoire";
 
 type Feedback = "correct" | "incorrect" | "revealed" | "illegal" | null;
@@ -78,11 +79,13 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
       move = game.move({ from, to, promotion: "q" });
     } catch {
       setFeedback("illegal");
+      playChessSound("illegal");
       return false;
     }
     const expectedGame = new Chess(current.fen);
     const expected = expectedGame.move(current.recommendedMove);
     const isCorrect = move.from === expected.from && move.to === expected.to && move.promotion === expected.promotion;
+    playMoveSound(game, move);
     setDisplayFen(game.fen());
     setLastMove({ from, to });
     if (isCorrect) {
@@ -110,6 +113,7 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
     recordAttempt(current.id, false, hints, streak);
     const game = new Chess(current.fen);
     const move = game.move(current.recommendedMove);
+    playMoveSound(game, move);
     setDisplayFen(game.fen());
     setLastMove({ from: move.from, to: move.to });
   };

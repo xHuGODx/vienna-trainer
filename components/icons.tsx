@@ -61,3 +61,7 @@ export function LightbulbIcon(props: Props) {
 export function ShareIcon(props: Props) {
   return <Icon {...props}><circle cx="18" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.7"/><circle cx="6" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.7"/><circle cx="18" cy="19" r="2.5" stroke="currentColor" strokeWidth="1.7"/><path d="m8.2 10.8 7.5-4.5M8.2 13.2l7.5 4.5" stroke="currentColor" strokeWidth="1.7"/></Icon>;
 }
+
+export function SoundIcon({ muted = false, ...props }: Props & { muted?: boolean }) {
+  return <Icon {...props}><path d="M5 10v4h3l4 3V7l-4 3H5Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.8"/>{muted ? <path d="m16 10 4 4m0-4-4 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8"/> : <><path d="M15 9.5a4 4 0 0 1 0 5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8"/><path d="M18 7a7 7 0 0 1 0 10" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8"/></>}</Icon>;
+}

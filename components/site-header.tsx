@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookIcon, ChartIcon, KnightIcon, TargetIcon } from "@/components/icons";
+import { BookIcon, ChartIcon, KnightIcon, SoundIcon, TargetIcon } from "@/components/icons";
+import { playChessSound, setChessSoundEnabled, useChessSoundEnabled } from "@/lib/sounds";
 
 const nav = [
   { href: "/repertorio", label: "Repertoire", icon: BookIcon },
@@ -12,6 +13,14 @@ const nav = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const soundEnabled = useChessSoundEnabled();
+
+  const toggleSound = () => {
+    const enabled = !soundEnabled;
+    setChessSoundEnabled(enabled);
+    if (enabled) playChessSound("move");
+  };
+
   return (
     <header className="site-header">
       <div className="shell header-inner">
@@ -25,6 +34,7 @@ export function SiteHeader() {
               <NavIcon size={17} /><span>{label}</span>
             </Link>
           ))}
+          <button className="sound-toggle" aria-label={soundEnabled ? "Mute chess sounds" : "Enable chess sounds"} aria-pressed={soundEnabled} onClick={toggleSound} title={soundEnabled ? "Mute sounds" : "Enable sounds"} type="button"><SoundIcon muted={!soundEnabled} size={18} /></button>
         </nav>
       </div>
     </header>

@@ -8,6 +8,7 @@ import { CheckIcon, CloseIcon, LightbulbIcon, TargetIcon } from "@/components/ic
 import { difficultyLabels, familyLabels } from "@/data/repertoire";
 import { fenAfterMoves, formatMoveSequence } from "@/lib/chess";
 import { incrementSessions, recordAttempt } from "@/lib/progress";
+import { playChessSound, playMoveSound } from "@/lib/sounds";
 import type { Variation } from "@/types/repertoire";
 
 type Feedback = "correct" | "incorrect" | "revealed" | "illegal" | null;
@@ -65,6 +66,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
       move = game.move({ from, to, promotion: "q" });
     } catch {
       setFeedback("illegal");
+      playChessSound("illegal");
       return false;
     }
 
@@ -76,6 +78,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
       setFeedback("incorrect");
       setMistakesOnMove((value) => value + 1);
       setStreak(0);
+      playChessSound("illegal");
       return false;
     }
 
@@ -83,6 +86,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
     const nextStreak = flawless ? streak + 1 : 0;
     setDisplayFen(game.fen());
     setLastMove({ from, to });
+    playMoveSound(game, move);
     setFeedback("correct");
     setCorrect((value) => value + 1);
     setStreak(nextStreak);
@@ -96,6 +100,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
     if (feedback === "correct" || feedback === "revealed") return;
     const game = new Chess(fenAfterMoves(variation.moves, expectedPly));
     const move = game.move(expectedSan);
+    playMoveSound(game, move);
     setDisplayFen(game.fen());
     setLastMove({ from: move.from, to: move.to });
     setFeedback("revealed");
@@ -110,6 +115,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
     if (blackPly < variation.moves.length) {
       const game = new Chess(fenAfterMoves(variation.moves, expectedPly + 1));
       const reply = game.move(variation.moves[blackPly]);
+      playMoveSound(game, reply);
       setDisplayFen(game.fen());
       setLastMove({ from: reply.from, to: reply.to });
     }

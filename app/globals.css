@@ -51,6 +51,9 @@ ul { margin: 0; padding: 0; }
 .site-header nav a { align-items: center; border-radius: 9px; color: var(--muted); display: flex; font-size: 13px; font-weight: 650; gap: 7px; padding: 9px 12px; transition: background 150ms, color 150ms; }
 .site-header nav a:hover { background: var(--surface-2); color: var(--text); }
 .site-header nav a.active { background: var(--surface-3); color: var(--text-strong); }
+.sound-toggle { align-items: center; background: transparent; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); cursor: pointer; display: flex; height: 37px; justify-content: center; margin-left: 5px; transition: background 150ms, border-color 150ms, color 150ms; width: 37px; }
+.sound-toggle:hover { background: var(--surface-2); border-color: var(--line-light); color: var(--text); }
+.sound-toggle[aria-pressed="false"] { color: var(--faint); }
 
 .button { align-items: center; border: 1px solid transparent; border-radius: 10px; cursor: pointer; display: inline-flex; font-size: 13px; font-weight: 750; gap: 8px; justify-content: center; min-height: 44px; padding: 10px 16px; transition: background 150ms, border-color 150ms, color 150ms, transform 150ms; }
 .button:hover { transform: translateY(-1px); }
