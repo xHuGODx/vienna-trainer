@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type PieceSymbol, type Square } from "chess.js";
 import { ChessBoard } from "@/components/chess-board";
 import { CheckIcon, CloseIcon, LightbulbIcon, TargetIcon } from "@/components/icons";
@@ -103,7 +103,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
     saveKeyPositionResult(false, hints, streak);
   };
 
-  const advance = () => {
+  const advance = useCallback(() => {
     const blackPly = expectedPly + 1;
     const nextWhitePly = expectedPly + 2;
 
@@ -123,7 +123,13 @@ export function LineTrainer({ variation }: { variation: Variation }) {
     setFeedback(null);
     setHints(0);
     setMistakesOnMove(0);
-  };
+  }, [expectedPly, variation.moves]);
+
+  useEffect(() => {
+    if (feedback !== "correct" && feedback !== "revealed") return;
+    const timer = window.setTimeout(advance, 1200);
+    return () => window.clearTimeout(timer);
+  }, [advance, feedback]);
 
   const restart = () => {
     setExpectedPly(0);
@@ -200,7 +206,7 @@ export function LineTrainer({ variation }: { variation: Variation }) {
             <div className="answer-title">{feedback === "correct" ? <CheckIcon /> : <CloseIcon />}<div><span>{feedback === "correct" ? "Correct!" : "Answer revealed"}</span><strong>{expectedSan}</strong></div></div>
             <p>{keyPosition?.explanation ?? "This is the repertoire move. Keep following the plan to reach the target position."}</p>
             <div className="idea-box"><span>Idea</span><p>{keyPosition?.idea ?? variation.ideas[Math.min(Math.floor(expectedPly / 2), variation.ideas.length - 1)]}</p></div>
-            <div className="answer-actions"><Link href={`/repertorio/${variation.id}`}>Review line</Link><button className="button primary" onClick={advance} type="button">{expectedPly + 2 >= variation.moves.length ? "Finish line" : "Play Black's reply"}</button></div>
+            <div className="answer-actions"><Link href={`/repertorio/${variation.id}`}>Review line</Link><span className="auto-reply" aria-live="polite">{expectedPly + 1 < variation.moves.length ? "Black replies automatically…" : "Completing line…"}</span></div>
           </div>
         )}
       </section>
