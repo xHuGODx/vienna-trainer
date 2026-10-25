@@ -8,7 +8,7 @@ import { CheckIcon, CloseIcon, LightbulbIcon, TargetIcon } from "@/components/ic
 import { difficultyLabels, familyLabels } from "@/data/repertoire";
 import { formatMoveSequence } from "@/lib/chess";
 import { incrementSessions, recordAttempt, useProgress } from "@/lib/progress";
-import type { Difficulty, TrainingPosition, VariationFamily } from "@/types/repertoire";
+import type { Difficulty, TrainingPosition, Variation, VariationFamily } from "@/types/repertoire";
 
 type Feedback = "correct" | "incorrect" | "revealed" | "illegal" | null;
 type LengthOption = 5 | 10 | 20 | "infinite";
@@ -22,7 +22,7 @@ function shuffled<T>(items: T[]): T[] {
   return next;
 }
 
-export function Trainer({ positions, initialFamily = "all" }: { positions: TrainingPosition[]; initialFamily?: VariationFamily | "all" }) {
+export function Trainer({ positions, variations, initialFamily = "all" }: { positions: TrainingPosition[]; variations: Variation[]; initialFamily?: VariationFamily | "all" }) {
   const progress = useProgress();
   const [family, setFamily] = useState<VariationFamily | "all">(initialFamily);
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
@@ -40,6 +40,7 @@ export function Trainer({ positions, initialFamily = "all" }: { positions: Train
   const [displayFen, setDisplayFen] = useState("");
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
   const [complete, setComplete] = useState(false);
+  const [lineId, setLineId] = useState(variations[0]?.id ?? "");
 
   const available = useMemo(() => positions.filter((position) => {
     if (family !== "all" && position.family !== family) return false;
@@ -159,6 +160,11 @@ export function Trainer({ positions, initialFamily = "all" }: { positions: Train
           <label className="review-toggle"><input checked={reviewOnly} onChange={(event) => setReviewOnly(event.target.checked)} type="checkbox"/><span>Previous mistakes only</span></label>
         </div>
         <div className="setup-footer"><span>{available.length} positions available</span><button className="button primary" disabled={!available.length} onClick={begin} type="button">{complete ? "Train again" : "Start training"}</button></div>
+        <div className="line-picker">
+          <div><span>Full-line training</span><strong>Play a variation from start to finish</strong><p>You play every move for White while the trainer handles Black&apos;s replies.</p></div>
+          <label><span className="sr-only">Choose a line</span><select onChange={(event) => setLineId(event.target.value)} value={lineId}>{variations.map((variation) => <option key={variation.id} value={variation.id}>{variation.title} · {variation.subtitle}</option>)}</select></label>
+          <Link className="button secondary" href={`/treinar?line=${lineId}`}>Train full line</Link>
+        </div>
       </div>
     );
   }

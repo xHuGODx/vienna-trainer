@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Chess } from "chess.js";
-import { ChevronLeftIcon, ChevronRightIcon, RotateIcon, ShareIcon } from "@/components/icons";
+import Link from "next/link";
+import { ChevronLeftIcon, ChevronRightIcon, RotateIcon, ShareIcon, TargetIcon } from "@/components/icons";
 import { ChessBoard } from "@/components/chess-board";
 import { difficultyLabels, familyLabels } from "@/data/repertoire";
 import { fenAfterMoves, moveNumberLabel } from "@/lib/chess";
@@ -58,6 +59,7 @@ export function StudyView({ variation }: { variation: Variation }) {
         <h1>{variation.title}</h1>
         <p className="study-opponent">{variation.opponentApproach}</p>
         <button className="share-button" onClick={share} type="button"><ShareIcon size={17} />{copied ? "Link copied" : "Share"}</button>
+        <Link className="button primary study-train-button" href={`/treinar?line=${variation.id}`}><TargetIcon size={17} />Train full line</Link>
 
         <div className="move-list" aria-label="Move list">
           {variation.moves.map((move, index) => <button className={index + 1 === ply ? "current" : index < ply ? "played" : ""} key={`${move}-${index}`} onClick={() => setPly(index + 1)} type="button"><small>{moveNumberLabel(index)}</small>{move}</button>)}
