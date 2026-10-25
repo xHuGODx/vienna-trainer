@@ -145,20 +145,20 @@ export function Trainer({ positions, initialFamily = "all" }: { positions: Train
         {complete ? (
           <div className="session-complete">
             <div className="success-ring"><TargetIcon size={34} /></div>
-            <span>Sessão concluída</span>
-            <h2>{correct} certas em {correct + incorrect}</h2>
-            <p>{score} pontos · melhor sequência nesta sessão: {bestSessionStreak}</p>
+            <span>Session complete</span>
+            <h2>{correct} correct out of {correct + incorrect}</h2>
+            <p>{score} points · best streak this session: {bestSessionStreak}</p>
           </div>
         ) : (
-          <div className="setup-intro"><span>Configurar sessão</span><h2>O que queres treinar?</h2><p>Escolhe uma família e recebe posições aleatórias onde são as brancas a jogar.</p></div>
+          <div className="setup-intro"><span>Set up session</span><h2>What do you want to train?</h2><p>Choose a family and get random positions with White to move.</p></div>
         )}
         <div className="setup-grid">
-          <label><span>Família</span><select value={family} onChange={(event) => setFamily(event.target.value as VariationFamily | "all")}><option value="all">Todas as linhas</option>{Object.entries(familyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          <label><span>Dificuldade</span><select value={difficulty} onChange={(event) => setDifficulty(event.target.value as Difficulty | "all")}><option value="all">Todas</option>{Object.entries(difficultyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          <label><span>Duração</span><select value={length} onChange={(event) => setLength(event.target.value === "infinite" ? "infinite" : Number(event.target.value) as 5 | 10 | 20)}><option value={5}>5 posições</option><option value={10}>10 posições</option><option value={20}>20 posições</option><option value="infinite">Treino infinito</option></select></label>
-          <label className="review-toggle"><input checked={reviewOnly} onChange={(event) => setReviewOnly(event.target.checked)} type="checkbox"/><span>Só erros anteriores</span></label>
+          <label><span>Family</span><select value={family} onChange={(event) => setFamily(event.target.value as VariationFamily | "all")}><option value="all">All lines</option>{Object.entries(familyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label><span>Difficulty</span><select value={difficulty} onChange={(event) => setDifficulty(event.target.value as Difficulty | "all")}><option value="all">All</option>{Object.entries(difficultyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label><span>Length</span><select value={length} onChange={(event) => setLength(event.target.value === "infinite" ? "infinite" : Number(event.target.value) as 5 | 10 | 20)}><option value={5}>5 positions</option><option value={10}>10 positions</option><option value={20}>20 positions</option><option value="infinite">Endless training</option></select></label>
+          <label className="review-toggle"><input checked={reviewOnly} onChange={(event) => setReviewOnly(event.target.checked)} type="checkbox"/><span>Previous mistakes only</span></label>
         </div>
-        <div className="setup-footer"><span>{available.length} posições disponíveis</span><button className="button primary" disabled={!available.length} onClick={begin} type="button">{complete ? "Treinar novamente" : "Começar treino"}</button></div>
+        <div className="setup-footer"><span>{available.length} positions available</span><button className="button primary" disabled={!available.length} onClick={begin} type="button">{complete ? "Train again" : "Start training"}</button></div>
       </div>
     );
   }
@@ -166,33 +166,33 @@ export function Trainer({ positions, initialFamily = "all" }: { positions: Train
   return (
     <div className="trainer-layout">
       <section className="trainer-board-column">
-        <div className="trainer-scorebar"><div><span>Pontos</span><strong>{score}</strong></div><div><span>Certas</span><strong>{correct}</strong></div><div><span>Sequência</span><strong>{streak}</strong></div><div><span>Posição</span><strong>{index + 1}{length !== "infinite" && `/${queue.length}`}</strong></div></div>
+        <div className="trainer-scorebar"><div><span>Points</span><strong>{score}</strong></div><div><span>Correct</span><strong>{correct}</strong></div><div><span>Streak</span><strong>{streak}</strong></div><div><span>Position</span><strong>{index + 1}{length !== "infinite" && `/${queue.length}`}</strong></div></div>
         <ChessBoard fen={displayFen || current.fen} interactive={!feedback || feedback === "illegal"} lastMove={lastMove} onMove={answer} />
-        <p className="board-help">Arrasta uma peça ou seleciona a casa de origem e destino.</p>
+        <p className="board-help">Drag a piece or select its starting and destination squares.</p>
       </section>
 
       <section className="trainer-panel">
         <div className="trainer-context"><span>{familyLabels[current.family]}</span><span>{difficultyLabels[current.difficulty]}</span></div>
-        <h1>Qual é o próximo lance?</h1>
+        <h1>What is the next best move?</h1>
         <p>{current.opponentApproach}</p>
-        <div className="position-sequence"><span>Posição após</span><strong>{formatMoveSequence(current.movesToPosition)}</strong></div>
+        <div className="position-sequence"><span>Position after</span><strong>{formatMoveSequence(current.movesToPosition)}</strong></div>
 
         {!feedback || feedback === "illegal" ? (
           <div className="hint-area">
-            {feedback === "illegal" && <div className="feedback compact error"><CloseIcon size={18} /><span>Esse lance não é legal nesta posição.</span></div>}
+            {feedback === "illegal" && <div className="feedback compact error"><CloseIcon size={18} /><span>That move is not legal in this position.</span></div>}
             {hints > 0 && <div className="hint"><LightbulbIcon size={19} /><span>{hints === 1 ? current.pieceHint : current.squareHint}</span></div>}
             <div className="trainer-actions">
-              <button className="button secondary" disabled={hints >= 2} onClick={() => setHints((value) => Math.min(2, value + 1))} type="button"><LightbulbIcon size={17} />{hints ? "Outra pista" : "Pedir pista"}</button>
-              <button className="text-button" onClick={reveal} type="button">Mostrar resposta</button>
+              <button className="button secondary" disabled={hints >= 2} onClick={() => setHints((value) => Math.min(2, value + 1))} type="button"><LightbulbIcon size={17} />{hints ? "Another hint" : "Get a hint"}</button>
+              <button className="text-button" onClick={reveal} type="button">Show answer</button>
             </div>
           </div>
         ) : (
           <div className={`answer-card ${feedback === "correct" ? "success" : "error"}`}>
-            <div className="answer-title">{feedback === "correct" ? <CheckIcon /> : <CloseIcon />}<div><span>{feedback === "correct" ? "Certo!" : feedback === "revealed" ? "Resposta revelada" : "Outra ideia é melhor"}</span><strong>{current.recommendedMove}</strong></div></div>
+            <div className="answer-title">{feedback === "correct" ? <CheckIcon /> : <CloseIcon />}<div><span>{feedback === "correct" ? "Correct!" : feedback === "revealed" ? "Answer revealed" : "There is a better idea"}</span><strong>{current.recommendedMove}</strong></div></div>
             <p>{current.explanation}</p>
-            <div className="idea-box"><span>Ideia</span><p>{current.idea}</p></div>
-            {current.alternatives.length > 0 && <p className="alternatives">Alternativas jogáveis: {current.alternatives.join(", ")}</p>}
-            <div className="answer-actions"><Link href={`/repertorio/${current.variationId}`}>Estudar linha completa</Link><button className="button primary" onClick={next} type="button">Próxima posição</button></div>
+            <div className="idea-box"><span>Idea</span><p>{current.idea}</p></div>
+            {current.alternatives.length > 0 && <p className="alternatives">Playable alternatives: {current.alternatives.join(", ")}</p>}
+            <div className="answer-actions"><Link href={`/repertorio/${current.variationId}`}>Study full line</Link><button className="button primary" onClick={next} type="button">Next position</button></div>
           </div>
         )}
       </section>

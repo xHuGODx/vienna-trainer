@@ -17,7 +17,7 @@ for (const variation of repertoire) {
       game.move(san);
       fens.push(game.fen());
     } catch (error) {
-      errors.push(`${variation.id}: lance ilegal ${index + 1} (${san}): ${String(error)}`);
+      errors.push(`${variation.id}: illegal move ${index + 1} (${san}): ${String(error)}`);
     }
   });
 
@@ -27,7 +27,7 @@ for (const variation of repertoire) {
       continue;
     }
     if (position.afterPly % 2 !== 0) {
-      errors.push(`${variation.id}: posição de treino ${position.afterPly} não é a vez das brancas`);
+      errors.push(`${variation.id}: training position ${position.afterPly} is not White to move`);
       continue;
     }
     const fen = fens[position.afterPly];
@@ -42,7 +42,7 @@ for (const variation of repertoire) {
     const key = positionKey(fen);
     const previous = positions.get(key);
     if (previous && previous !== move) {
-      errors.push(`${variation.id}: posição duplicada com respostas incompatíveis (${previous}/${move})`);
+      errors.push(`${variation.id}: duplicate position with incompatible answers (${previous}/${move})`);
     } else {
       positions.set(key, move);
     }
@@ -50,10 +50,10 @@ for (const variation of repertoire) {
 }
 
 if (errors.length) {
-  console.error(`Repertório inválido (${errors.length} problemas):`);
+  console.error(`Invalid repertoire (${errors.length} problems):`);
   errors.forEach((error) => console.error(`- ${error}`));
   process.exit(1);
 }
 
-console.log(`✓ ${repertoire.length} variações legais`);
-console.log(`✓ ${positions.size} posições de treino únicas e válidas`);
+console.log(`✓ ${repertoire.length} legal variations`);
+console.log(`✓ ${positions.size} unique, valid training positions`);

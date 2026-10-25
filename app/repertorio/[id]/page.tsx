@@ -10,11 +10,11 @@ export function generateStaticParams() { return repertoire.map((variation) => ({
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const variation = variationById((await params).id);
-  return variation ? { title: variation.title, description: variation.summary } : { title: "Linha não encontrada" };
+  return variation ? { title: variation.title, description: variation.summary } : { title: "Line not found" };
 }
 
 export default async function VariationPage({ params }: { params: Promise<{ id: string }> }) {
   const variation = variationById((await params).id);
   if (!variation) notFound();
-  return <div className="page-shell shell detail-shell"><Link className="back-link" href="/repertorio"><ArrowLeftIcon size={18} />Voltar ao repertório</Link><StudyView variation={variation} /></div>;
+  return <div className="page-shell shell detail-shell"><Link className="back-link" href="/repertorio"><ArrowLeftIcon size={18} />Back to repertoire</Link><StudyView variation={variation} /></div>;
 }

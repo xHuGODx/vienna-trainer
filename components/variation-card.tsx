@@ -13,7 +13,7 @@ export function VariationCard({ variation }: { variation: Variation }) {
       <div className="move-preview">{formatMoveSequence(variation.moves.slice(0, 10))}</div>
       <p className="card-summary">{variation.summary}</p>
       <div className="tag-list">{variation.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div>
-      <Link className="card-link" href={`/repertorio/${variation.id}`}>Estudar linha <ArrowRightIcon size={17} /></Link>
+      <Link className="card-link" href={`/repertorio/${variation.id}`}>Study line <ArrowRightIcon size={17} /></Link>
     </article>
   );
 }

@@ -9,7 +9,7 @@ const pieces: Record<Color, Record<PieceSymbol, string>> = {
   b: { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" },
 };
 
-const pieceNames: Record<PieceSymbol, string> = { k: "rei", q: "dama", r: "torre", b: "bispo", n: "cavalo", p: "peão" };
+const pieceNames: Record<PieceSymbol, string> = { k: "king", q: "queen", r: "rook", b: "bishop", n: "knight", p: "pawn" };
 
 interface ChessBoardProps {
   fen: string;
@@ -44,7 +44,7 @@ export function ChessBoard({ fen, interactive = false, orientation = "white", on
 
   return (
     <div className="board-shell">
-      <div aria-label={`Tabuleiro de xadrez. ${game.turn() === "w" ? "Brancas" : "Pretas"} a jogar.`} className="chess-board" role="grid">
+      <div aria-label={`Chessboard. ${game.turn() === "w" ? "White" : "Black"} to move.`} className="chess-board" role="grid">
         {ranks.flatMap((row, rowIndex) => row.map((piece, colIndex) => {
           const visualRank = orientation === "white" ? 8 - rowIndex : rowIndex + 1;
           const visualFileIndex = orientation === "white" ? colIndex : 7 - colIndex;
@@ -55,7 +55,7 @@ export function ChessBoard({ fen, interactive = false, orientation = "white", on
           const isLast = lastMove?.from === square || lastMove?.to === square;
           return (
             <button
-              aria-label={`${square}${piece ? `, ${piece.color === "w" ? "branco" : "preto"} ${pieceNames[piece.type]}` : ", vazio"}`}
+              aria-label={`${square}${piece ? `, ${piece.color === "w" ? "white" : "black"} ${pieceNames[piece.type]}` : ", empty"}`}
               className={`board-square ${isLight ? "light" : "dark"}${isSelected ? " selected" : ""}${isTarget ? " target" : ""}${isLast ? " last" : ""}`}
               draggable={interactive && piece?.color === "w"}
               key={square}

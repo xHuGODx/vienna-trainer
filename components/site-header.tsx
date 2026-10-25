@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { BookIcon, ChartIcon, KnightIcon, TargetIcon } from "@/components/icons";
 
 const nav = [
-  { href: "/repertorio", label: "Repertório", icon: BookIcon },
-  { href: "/treinar", label: "Treinar", icon: TargetIcon },
-  { href: "/progresso", label: "Progresso", icon: ChartIcon },
+  { href: "/repertorio", label: "Repertoire", icon: BookIcon },
+  { href: "/treinar", label: "Train", icon: TargetIcon },
+  { href: "/progresso", label: "Progress", icon: ChartIcon },
 ];
 
 export function SiteHeader() {
@@ -15,11 +15,11 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <Link className="brand" href="/" aria-label="Vienna Trainer — início">
+        <Link className="brand" href="/" aria-label="Vienna Trainer — home">
           <span className="brand-mark"><KnightIcon size={23} /></span>
           <span><strong>Vienna</strong><small>Trainer</small></span>
         </Link>
-        <nav aria-label="Navegação principal">
+        <nav aria-label="Main navigation">
           {nav.map(({ href, label, icon: NavIcon }) => (
             <Link className={pathname.startsWith(href) ? "active" : ""} href={href} key={href}>
               <NavIcon size={17} /><span>{label}</span>

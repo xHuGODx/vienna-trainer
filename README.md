@@ -1,29 +1,29 @@
 # Vienna Game Trainer
 
-Mini-site em português para aprender e praticar um repertório de Vienna Game e Vienna Gambit com as peças brancas.
+A mini-site for learning and practising a Vienna Game and Vienna Gambit repertoire with the white pieces.
 
-Inclui um explorador de linhas, tabuleiro interativo, explicações por variação, treino de próximo lance, pistas progressivas e progresso guardado localmente.
+It includes a line explorer, an interactive chessboard, explanations for each variation, next-move training, progressive hints, and locally saved progress.
 
 ## Stack
 
-- Next.js 16, React 19 e TypeScript
-- `chess.js` para regras, SAN e FEN
-- Vitest para testes da lógica
-- CSS próprio, sem framework visual
-- Dados locais e sem backend
+- Next.js 16, React 19, and TypeScript
+- `chess.js` for chess rules, SAN, and FEN
+- Vitest for logic tests
+- Custom CSS with no visual framework
+- Local data and no backend
 
-## Executar localmente
+## Run locally
 
-Requer Node.js 24 ou uma versão compatível indicada pelo Next.js.
+Requires Node.js 24 or a compatible version supported by Next.js.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-## Validar
+## Validate
 
 ```bash
 npm run validate:repertoire
@@ -33,36 +33,36 @@ npm run typecheck
 npm run build
 ```
 
-O build executa automaticamente a validação do repertório.
+The build automatically validates the repertoire.
 
-## Repertório
+## Repertoire
 
-As variações estão em [`data/repertoire.ts`](./data/repertoire.ts). Cada linha contém:
+The variations live in [`data/repertoire.ts`](./data/repertoire.ts). Each line contains:
 
-- sequência em SAN;
-- família e dificuldade;
-- planos e alertas;
-- posições-chave com a continuação recomendada.
+- a SAN move sequence;
+- family and difficulty;
+- plans and warnings;
+- key positions with the recommended continuation.
 
-Para adicionar uma linha:
+To add a line:
 
-1. Adiciona uma nova `Variation` com ID único.
-2. Usa apenas lances SAN legais desde a posição inicial.
-3. Define posições de treino apenas quando são as brancas a jogar.
-4. Executa `npm run validate:repertoire`.
+1. Add a new `Variation` with a unique ID.
+2. Use only legal SAN moves from the starting position.
+3. Define training positions only when it is White's turn.
+4. Run `npm run validate:repertoire`.
 
-O validador reconstrói todas as partidas com `chess.js`, confirma os lances recomendados e rejeita posições duplicadas com respostas incompatíveis.
+The validator rebuilds every game with `chess.js`, checks all recommended moves, and rejects duplicate positions with incompatible answers.
 
-## Progresso
+## Progress
 
-O progresso é guardado em `localStorage`. Não existem contas, cookies de sessão ou base de dados.
+Progress is stored in `localStorage`. There are no accounts, session cookies, or databases.
 
 ## Deploy
 
-Importa o repositório na Vercel e usa o preset **Next.js**. Não são necessárias variáveis de ambiente. Opcionalmente, define `NEXT_PUBLIC_SITE_URL` com o domínio de produção para atualizar metadata e sitemap.
+Import the repository into Vercel and use the **Next.js** preset. No environment variables are required. Optionally, set `NEXT_PUBLIC_SITE_URL` to the production domain to update the metadata and sitemap.
 
-As recomendações constituem um repertório prático; não representam os únicos lances válidos em cada posição.
+The recommendations form a practical repertoire; they are not the only valid moves in each position.
 
-## Referências de abertura
+## Opening references
 
-O repertório foi cruzado com a página de abertura do [Lichess](https://lichess.org/opening/Vienna_Game_Vienna_Gambit) e com o conjunto público [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings). A validação local garante legalidade; as avaliações e recomendações continuam a representar um repertório pedagógico, não uma análise exaustiva de motor.
+The repertoire was cross-checked against the [Lichess opening page](https://lichess.org/opening/Vienna_Game_Vienna_Gambit) and the public [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings) dataset. Local validation guarantees legality; the evaluations and recommendations remain a teaching repertoire rather than exhaustive engine analysis.

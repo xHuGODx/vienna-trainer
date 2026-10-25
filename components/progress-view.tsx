@@ -36,22 +36,22 @@ export function ProgressView({ positions }: { positions: TrainingPosition[] }) {
   return (
     <div className="progress-content">
       <div className="progress-stats">
-        <div><span>Precisão</span><strong>{stats.accuracy}%</strong><small>{stats.attempts} tentativas</small></div>
-        <div><span>Dominadas</span><strong>{stats.mastered}</strong><small>de {positions.length} posições</small></div>
-        <div><span>A rever</span><strong>{stats.review}</strong><small>com erros recentes</small></div>
-        <div><span>Melhor sequência</span><strong>{progress.bestStreak}</strong><small>{progress.totalSessions} sessões</small></div>
+        <div><span>Accuracy</span><strong>{stats.accuracy}%</strong><small>{stats.attempts} attempts</small></div>
+        <div><span>Mastered</span><strong>{stats.mastered}</strong><small>out of {positions.length} positions</small></div>
+        <div><span>To review</span><strong>{stats.review}</strong><small>with recent mistakes</small></div>
+        <div><span>Best streak</span><strong>{progress.bestStreak}</strong><small>{progress.totalSessions} sessions</small></div>
       </div>
 
       {stats.attempts === 0 ? (
-        <div className="empty-state large"><TargetIcon size={32} /><h2>Ainda não há treino registado</h2><p>Completa a primeira sessão para começares a acompanhar a evolução.</p><Link className="button primary" href="/treinar">Começar treino</Link></div>
+        <div className="empty-state large"><TargetIcon size={32} /><h2>No training recorded yet</h2><p>Complete your first session to start tracking your progress.</p><Link className="button primary" href="/treinar">Start training</Link></div>
       ) : (
         <div className="progress-grid">
-          <section className="progress-card"><div className="section-title"><ChartIcon /><div><span>Por repertório</span><h2>Precisão por família</h2></div></div><div className="family-progress">{families.map((item) => <div key={item.family}><div><span>{familyLabels[item.family]}</span><strong>{item.attempts ? `${item.accuracy}%` : "—"}</strong></div><div className="progress-track"><span style={{ width: `${item.accuracy}%` }} /></div></div>)}</div></section>
-          <section className="progress-card"><div className="section-title"><TargetIcon /><div><span>Revisão</span><h2>Posições mais difíceis</h2></div></div>{difficult.length ? <div className="difficult-list">{difficult.map(({ position, data }) => <Link href={`/treinar?familia=${position.family}`} key={position.id}><div><strong>{position.variationTitle}</strong><span>{position.recommendedMove} · {data.incorrect} erros</span></div><span>{masteryFor(data.attempts, data.correct)}%</span></Link>)}</div> : <p className="all-good">Ainda não tens posições marcadas para revisão.</p>}</section>
+          <section className="progress-card"><div className="section-title"><ChartIcon /><div><span>By repertoire</span><h2>Accuracy by family</h2></div></div><div className="family-progress">{families.map((item) => <div key={item.family}><div><span>{familyLabels[item.family]}</span><strong>{item.attempts ? `${item.accuracy}%` : "—"}</strong></div><div className="progress-track"><span style={{ width: `${item.accuracy}%` }} /></div></div>)}</div></section>
+          <section className="progress-card"><div className="section-title"><TargetIcon /><div><span>Review</span><h2>Most difficult positions</h2></div></div>{difficult.length ? <div className="difficult-list">{difficult.map(({ position, data }) => <Link href={`/treinar?familia=${position.family}`} key={position.id}><div><strong>{position.variationTitle}</strong><span>{position.recommendedMove} · {data.incorrect} mistakes</span></div><span>{masteryFor(data.attempts, data.correct)}%</span></Link>)}</div> : <p className="all-good">You do not have any positions marked for review yet.</p>}</section>
         </div>
       )}
 
-      <div className="reset-row">{confirming ? <><span>Apagar todo o progresso local?</span><button className="text-button danger" onClick={() => { resetProgress(); setConfirming(false); }} type="button">Sim, apagar</button><button className="text-button" onClick={() => setConfirming(false)} type="button">Cancelar</button></> : <button className="text-button danger" onClick={() => setConfirming(true)} type="button">Repor progresso</button>}</div>
+      <div className="reset-row">{confirming ? <><span>Delete all local progress?</span><button className="text-button danger" onClick={() => { resetProgress(); setConfirming(false); }} type="button">Yes, delete</button><button className="text-button" onClick={() => setConfirming(false)} type="button">Cancel</button></> : <button className="text-button danger" onClick={() => setConfirming(true)} type="button">Reset progress</button>}</div>
     </div>
   );
 }

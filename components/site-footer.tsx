@@ -6,8 +6,8 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="shell footer-inner">
         <div className="footer-brand"><KnightIcon size={20} /><strong>Vienna Game Trainer</strong></div>
-        <p>Ferramenta pessoal de treino. As sugestões formam um repertório prático e não são os únicos lances jogáveis.</p>
-        <div><Link href="/repertorio">Repertório</Link><Link href="/treinar">Treinar</Link></div>
+        <p>A personal training tool. These suggestions form a practical repertoire and are not the only playable moves.</p>
+        <div><Link href="/repertorio">Repertoire</Link><Link href="/treinar">Train</Link></div>
       </div>
     </footer>
   );

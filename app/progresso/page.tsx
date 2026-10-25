@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ProgressView } from "@/components/progress-view";
 import { trainingPositions } from "@/lib/chess";
 
-export const metadata: Metadata = { title: "Progresso", description: "Acompanha a tua evolução no repertório Vienna." };
+export const metadata: Metadata = { title: "Progress", description: "Track your progress through the Vienna repertoire." };
 
 export default function ProgressPage() {
-  return <div className="page-shell shell"><header className="page-heading"><span>O teu treino</span><h1>Progresso</h1><p>Os dados ficam apenas neste navegador. Revê os padrões que ainda não estão automáticos.</p></header><ProgressView positions={trainingPositions} /></div>;
+  return <div className="page-shell shell"><header className="page-heading"><span>Your training</span><h1>Progress</h1><p>Your data stays in this browser. Review the patterns that have not become automatic yet.</p></header><ProgressView positions={trainingPositions} /></div>;
 }
