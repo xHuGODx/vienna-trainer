@@ -46,6 +46,24 @@ export interface TrainingPosition {
   pieceHint: string;
   squareHint: string;
   alternatives: string[];
+  families: VariationFamily[];
+  difficulties: Difficulty[];
+  variationIds: string[];
+  answers: TrainingAnswer[];
+}
+
+export interface TrainingAnswer {
+  move: string;
+  variationId: string;
+  variationTitle: string;
+  family: VariationFamily;
+  difficulty: Difficulty;
+  opponentApproach: string;
+  explanation: string;
+  idea: string;
+  pieceHint: string;
+  squareHint: string;
+  alternatives: string[];
 }
 
 export interface PositionProgress {

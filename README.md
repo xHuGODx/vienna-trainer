@@ -51,7 +51,7 @@ To add a line:
 3. Define training positions only when it is White's turn.
 4. Run `npm run validate:repertoire`.
 
-The validator rebuilds every game with `chess.js`, checks all recommended moves, and rejects duplicate positions with incompatible answers.
+The validator rebuilds every game with `chess.js`, checks every White decision, deduplicates shared positions, and verifies every accepted repertoire answer.
 
 ## Progress
 

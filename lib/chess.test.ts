@@ -13,10 +13,13 @@ describe("repertoire", () => {
 
   it("generates unique positions with legal answers", () => {
     const positions = createTrainingPositions();
+    expect(positions).toHaveLength(67);
     expect(new Set(positions.map((position) => positionKey(position.fen))).size).toBe(positions.length);
     for (const position of positions) {
-      const game = new Chess(position.fen);
-      expect(() => game.move(position.recommendedMove), position.id).not.toThrow();
+      for (const answer of position.answers) {
+        const game = new Chess(position.fen);
+        expect(() => game.move(answer.move), `${position.id}: ${answer.move}`).not.toThrow();
+      }
     }
   });
 });

@@ -1,13 +1,12 @@
 import { Chess } from "chess.js";
 import { repertoire } from "../data/repertoire";
-import { positionKey } from "../lib/chess";
+import { createTrainingPositions, positionKey } from "../lib/chess";
 
 const errors: string[] = [];
 const ids = new Set<string>();
-const positions = new Map<string, string>();
 
 for (const variation of repertoire) {
-  if (ids.has(variation.id)) errors.push(`ID duplicado: ${variation.id}`);
+  if (ids.has(variation.id)) errors.push(`Duplicate ID: ${variation.id}`);
   ids.add(variation.id);
 
   const game = new Chess();
@@ -23,7 +22,7 @@ for (const variation of repertoire) {
 
   for (const position of variation.keyPositions) {
     if (position.afterPly < 4 || position.afterPly >= variation.moves.length) {
-      errors.push(`${variation.id}: afterPly ${position.afterPly} fora da linha`);
+      errors.push(`${variation.id}: afterPly ${position.afterPly} is outside the line`);
       continue;
     }
     if (position.afterPly % 2 !== 0) {
@@ -37,14 +36,37 @@ for (const variation of repertoire) {
     try {
       trainingGame.move(move);
     } catch {
-      errors.push(`${variation.id}: resposta recomendada ilegal em ${position.afterPly}: ${move}`);
+      errors.push(`${variation.id}: illegal recommended move at ${position.afterPly}: ${move}`);
     }
-    const key = positionKey(fen);
-    const previous = positions.get(key);
-    if (previous && previous !== move) {
-      errors.push(`${variation.id}: duplicate position with incompatible answers (${previous}/${move})`);
-    } else {
-      positions.set(key, move);
+  }
+}
+
+const trainingPositions = createTrainingPositions(repertoire);
+const positionsByKey = new Map(trainingPositions.map((position) => [positionKey(position.fen), position]));
+
+for (const variation of repertoire) {
+  for (let afterPly = 0; afterPly < variation.moves.length; afterPly += 2) {
+    const game = new Chess();
+    variation.moves.slice(0, afterPly).forEach((move) => game.move(move));
+    const position = positionsByKey.get(positionKey(game.fen()));
+    const expectedMove = variation.moves[afterPly];
+    if (!position) {
+      errors.push(`${variation.id}: missing training position at ${afterPly}`);
+      continue;
+    }
+    if (!position.answers.some((answer) => answer.move === expectedMove && answer.variationId === variation.id)) {
+      errors.push(`${variation.id}: missing ${expectedMove} as an accepted answer at ${afterPly}`);
+    }
+  }
+}
+
+for (const position of trainingPositions) {
+  if (!position.fen.includes(" w ")) errors.push(`${position.id}: training position is not White to move`);
+  for (const answer of position.answers) {
+    try {
+      new Chess(position.fen).move(answer.move);
+    } catch {
+      errors.push(`${position.id}: illegal accepted answer ${answer.move}`);
     }
   }
 }
@@ -56,4 +78,4 @@ if (errors.length) {
 }
 
 console.log(`✓ ${repertoire.length} legal variations`);
-console.log(`✓ ${positions.size} unique, valid training positions`);
+console.log(`✓ ${trainingPositions.length} unique, valid training positions covering every line`);

@@ -20,7 +20,7 @@ export function ProgressView({ positions }: { positions: TrainingPosition[] }) {
   }, [progress.positions]);
 
   const families = Object.keys(familyLabels).map((family) => {
-    const ids = positions.filter((position) => position.family === family).map((position) => position.id);
+    const ids = positions.filter((position) => position.families.includes(family as VariationFamily)).map((position) => position.id);
     const records = ids.map((id) => progress.positions[id]).filter(Boolean);
     const attempts = records.reduce((sum, item) => sum + item.attempts, 0);
     const correct = records.reduce((sum, item) => sum + item.correct, 0);

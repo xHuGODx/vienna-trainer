@@ -9,10 +9,10 @@ import { difficultyLabels, familyLabels } from "@/data/repertoire";
 import { formatMoveSequence } from "@/lib/chess";
 import { incrementSessions, recordAttempt, useProgress } from "@/lib/progress";
 import { playChessSound, playMoveSound } from "@/lib/sounds";
-import type { Difficulty, TrainingPosition, Variation, VariationFamily } from "@/types/repertoire";
+import type { Difficulty, TrainingAnswer, TrainingPosition, Variation, VariationFamily } from "@/types/repertoire";
 
 type Feedback = "correct" | "incorrect" | "revealed" | "illegal" | null;
-type LengthOption = 5 | 10 | 20 | "infinite";
+type LengthOption = 5 | 10 | 20 | "all" | "infinite";
 
 function shuffled<T>(items: T[]): T[] {
   const next = [...items];
@@ -42,19 +42,29 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | null>(null);
   const [complete, setComplete] = useState(false);
   const [lineId, setLineId] = useState(variations[0]?.id ?? "");
+  const [selectedAnswer, setSelectedAnswer] = useState<TrainingAnswer | null>(null);
 
   const available = useMemo(() => positions.filter((position) => {
-    if (family !== "all" && position.family !== family) return false;
-    if (difficulty !== "all" && position.difficulty !== difficulty) return false;
+    const hasMatchingAnswer = position.answers.some((answer) =>
+      (family === "all" || answer.family === family)
+      && (difficulty === "all" || answer.difficulty === difficulty));
+    if (!hasMatchingAnswer) return false;
     if (reviewOnly && !(progress.positions[position.id]?.incorrect > 0)) return false;
     return true;
   }), [positions, family, difficulty, reviewOnly, progress.positions]);
 
   const current = queue[index];
+  const currentAnswers = useMemo(() => current?.answers.filter((answer) =>
+    (family === "all" || answer.family === family)
+    && (difficulty === "all" || answer.difficulty === difficulty)) ?? [], [current, family, difficulty]);
+  const answerToShow = selectedAnswer ?? currentAnswers[0];
+  const playableAlternatives = answerToShow
+    ? Array.from(new Set([...answerToShow.alternatives, ...currentAnswers.filter((answer) => answer.move !== answerToShow.move).map((answer) => answer.move)]))
+    : [];
 
   const begin = () => {
     const random = shuffled(available);
-    const selected = length === "infinite" ? random : random.slice(0, length);
+    const selected = length === "infinite" || length === "all" ? random : random.slice(0, length);
     if (!selected.length) return;
     setQueue(selected);
     setIndex(0);
@@ -68,6 +78,7 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
     setDisplayFen(selected[0].fen);
     setLastMove(null);
     setComplete(false);
+    setSelectedAnswer(null);
     incrementSessions();
   };
 
@@ -82,9 +93,12 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
       playChessSound("illegal");
       return false;
     }
-    const expectedGame = new Chess(current.fen);
-    const expected = expectedGame.move(current.recommendedMove);
-    const isCorrect = move.from === expected.from && move.to === expected.to && move.promotion === expected.promotion;
+    const matchingAnswer = currentAnswers.find((answer) => {
+      const expected = new Chess(current.fen).move(answer.move);
+      return move.from === expected.from && move.to === expected.to && move.promotion === expected.promotion;
+    });
+    const isCorrect = Boolean(matchingAnswer);
+    setSelectedAnswer(matchingAnswer ?? currentAnswers[0] ?? null);
     playMoveSound(game, move);
     setDisplayFen(game.fen());
     setLastMove({ from, to });
@@ -111,8 +125,11 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
     setIncorrect((value) => value + 1);
     setStreak(0);
     recordAttempt(current.id, false, hints, streak);
+    const revealedAnswer = currentAnswers[0];
+    if (!revealedAnswer) return;
+    setSelectedAnswer(revealedAnswer);
     const game = new Chess(current.fen);
-    const move = game.move(current.recommendedMove);
+    const move = game.move(revealedAnswer.move);
     playMoveSound(game, move);
     setDisplayFen(game.fen());
     setLastMove({ from: move.from, to: move.to });
@@ -128,6 +145,7 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
         setIndex((value) => value + 1);
         setFeedback(null);
         setHints(0);
+        setSelectedAnswer(null);
         setDisplayFen(nextPosition.fen);
         setLastMove(null);
         return;
@@ -140,6 +158,7 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
     setIndex((value) => value + 1);
     setFeedback(null);
     setHints(0);
+    setSelectedAnswer(null);
     setDisplayFen(nextPosition.fen);
     setLastMove(null);
   };
@@ -155,12 +174,12 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
             <p>{score} points · best streak this session: {bestSessionStreak}</p>
           </div>
         ) : (
-          <div className="setup-intro"><span>Set up session</span><h2>What do you want to train?</h2><p>Choose a family and get random positions with White to move.</p></div>
+          <div className="setup-intro"><span>Set up session</span><h2>What do you want to train?</h2><p>Choose a family and train its unique positions with White to move.</p></div>
         )}
         <div className="setup-grid">
           <label><span>Family</span><select value={family} onChange={(event) => setFamily(event.target.value as VariationFamily | "all")}><option value="all">All lines</option>{Object.entries(familyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label><span>Difficulty</span><select value={difficulty} onChange={(event) => setDifficulty(event.target.value as Difficulty | "all")}><option value="all">All</option>{Object.entries(difficultyLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          <label><span>Length</span><select value={length} onChange={(event) => setLength(event.target.value === "infinite" ? "infinite" : Number(event.target.value) as 5 | 10 | 20)}><option value={5}>5 positions</option><option value={10}>10 positions</option><option value={20}>20 positions</option><option value="infinite">Endless training</option></select></label>
+          <label><span>Length</span><select value={length} onChange={(event) => setLength(event.target.value === "all" || event.target.value === "infinite" ? event.target.value : Number(event.target.value) as 5 | 10 | 20)}><option value={5}>5 positions</option><option value={10}>10 positions</option><option value={20}>20 positions</option><option value="all">All available positions</option><option value="infinite">Endless training</option></select></label>
           <label className="review-toggle"><input checked={reviewOnly} onChange={(event) => setReviewOnly(event.target.checked)} type="checkbox"/><span>Previous mistakes only</span></label>
         </div>
         <div className="setup-footer"><span>{available.length} positions available</span><button className="button primary" disabled={!available.length} onClick={begin} type="button">{complete ? "Train again" : "Start training"}</button></div>
@@ -182,15 +201,15 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
       </section>
 
       <section className="trainer-panel">
-        <div className="trainer-context"><span>{familyLabels[current.family]}</span><span>{difficultyLabels[current.difficulty]}</span></div>
+        <div className="trainer-context"><span>{currentAnswers.length > 1 ? "Multiple lines" : familyLabels[answerToShow?.family ?? current.family]}</span><span>{difficultyLabels[answerToShow?.difficulty ?? current.difficulty]}</span></div>
         <h1>What is the next best move?</h1>
-        <p>{current.opponentApproach}</p>
-        <div className="position-sequence"><span>Position after</span><strong>{formatMoveSequence(current.movesToPosition)}</strong></div>
+        <p>{currentAnswers.length === 1 ? answerToShow?.opponentApproach : current.opponentApproach}</p>
+        <div className="position-sequence"><span>{current.movesToPosition.length ? "Position after" : "Position"}</span><strong>{current.movesToPosition.length ? formatMoveSequence(current.movesToPosition) : "Starting position"}</strong></div>
 
         {!feedback || feedback === "illegal" ? (
           <div className="hint-area">
             {feedback === "illegal" && <div className="feedback compact error"><CloseIcon size={18} /><span>That move is not legal in this position.</span></div>}
-            {hints > 0 && <div className="hint"><LightbulbIcon size={19} /><span>{hints === 1 ? current.pieceHint : current.squareHint}</span></div>}
+            {hints > 0 && answerToShow && <div className="hint"><LightbulbIcon size={19} /><span>{hints === 1 ? answerToShow.pieceHint : answerToShow.squareHint}</span></div>}
             <div className="trainer-actions">
               <button className="button secondary" disabled={hints >= 2} onClick={() => setHints((value) => Math.min(2, value + 1))} type="button"><LightbulbIcon size={17} />{hints ? "Another hint" : "Get a hint"}</button>
               <button className="text-button" onClick={reveal} type="button">Show answer</button>
@@ -198,11 +217,11 @@ export function Trainer({ positions, variations, initialFamily = "all" }: { posi
           </div>
         ) : (
           <div className={`answer-card ${feedback === "correct" ? "success" : "error"}`}>
-            <div className="answer-title">{feedback === "correct" ? <CheckIcon /> : <CloseIcon />}<div><span>{feedback === "correct" ? "Correct!" : feedback === "revealed" ? "Answer revealed" : "There is a better idea"}</span><strong>{current.recommendedMove}</strong></div></div>
-            <p>{current.explanation}</p>
-            <div className="idea-box"><span>Idea</span><p>{current.idea}</p></div>
-            {current.alternatives.length > 0 && <p className="alternatives">Playable alternatives: {current.alternatives.join(", ")}</p>}
-            <div className="answer-actions"><Link href={`/repertorio/${current.variationId}`}>Study full line</Link><button className="button primary" onClick={next} type="button">Next position</button></div>
+            <div className="answer-title">{feedback === "correct" ? <CheckIcon /> : <CloseIcon />}<div><span>{feedback === "correct" ? "Correct!" : feedback === "revealed" ? "Answer revealed" : "There is a better idea"}</span><strong>{answerToShow?.move}</strong></div></div>
+            <p>{answerToShow?.explanation}</p>
+            <div className="idea-box"><span>Idea</span><p>{answerToShow?.idea}</p></div>
+            {playableAlternatives.length > 0 && <p className="alternatives">Other repertoire choices: {playableAlternatives.join(", ")}</p>}
+            <div className="answer-actions"><Link href={`/repertorio/${answerToShow?.variationId ?? current.variationId}`}>Study full line</Link><button className="button primary" onClick={next} type="button">Next position</button></div>
           </div>
         )}
       </section>
